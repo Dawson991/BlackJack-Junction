@@ -11,6 +11,7 @@ package ca.sheridancollege.project;
 public class BlackJackDealer {
 
     private Hand hand;
+    private Boolean hasBlackjack;
 
     public Hand getHand() {
             return hand;
@@ -24,6 +25,15 @@ public class BlackJackDealer {
     public void dealCard(PlayingCard card) {
             hand.addCard(card);
     }
+    
+        public boolean hasBlackjack() {
+        return hasBlackjack;
+    }
+
+    public void setHasBlackjack(boolean hasBlackjack) {
+        this.hasBlackjack = hasBlackjack;
+    }
+
 
     // Calculate and return the value of the dealer's hand
     public int calculateHandValue() {
