@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ca.sheridancollege.project;
 
-/**
- *
- * @author Dawso
- */
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -84,7 +76,7 @@ public class BlackJackGame extends Game {
         //Loop to play another round of blackjack
         while (playAgain) {
             player.setHasBlackjack(false);
-
+            dealer.setHasBlackjack(false);
             // Randomize the cards in the array
             deck.shuffle();
 
@@ -93,7 +85,10 @@ public class BlackJackGame extends Game {
             int betAmount;
             do {
                 System.out.println("You have " + player.getChips() + " chips. Enter your bet amount (between 1 and " + player.getChips() + "): ");
-
+                
+                
+                //https://www.tutorialspoint.com/java/util/scanner_hasnextint.htm
+                //Checks for valid user input values
                 if (scanner.hasNextInt()) {
                     betAmount = scanner.nextInt();
                     scanner.nextLine();
@@ -142,6 +137,10 @@ public class BlackJackGame extends Game {
             }
 
             // Dealer's turn (hit logic)
+            if (dealer.getHand().calculateHandValue() == 21) {
+            dealer.setHasBlackjack(true);
+            break;}
+            else{
             while (dealer.shouldHit()) {
                 PlayingCard dealtCard = deck.dealCard();
                 dealer.getHand().addCard(dealtCard);
@@ -151,15 +150,23 @@ public class BlackJackGame extends Game {
                 System.out.println("Dealers Total Value: " + dealer.calculateHandValue());
                 System.out.println("**********************************************************");
             }
+            }
+            
+            //Display dealers hand and players hand for a clear understanding of why either player or dealer won
+            System.out.println("-----FINAL HANDS: -----");
+            System.out.println("********DEALERS HAND Final Hand: ************************************");
+            System.out.println("Dealers Hand: " + dealer.getHand());
+            System.out.println("Dealers Total Value: " + dealer.calculateHandValue());
+            System.out.println("**********************************************************");
+
+            System.out.println("*******" + player.getName().toUpperCase() + "S Final HAND: " + "***************************************");
+            System.out.println("Your hand: " + player.getHand());
+            System.out.println("Your Current score: " + player.getHand().calculateHandValue());
+            System.out.println("***********************************************************");
 
             // Declare the winner
             declareWinner();
 
-            // if the play reaches 0 or less chips they lose
-            if (player.getChips() <= 0) {
-                System.out.println("You have run out of chips.. Better luck next time");
-                playAgain = false;
-            }
 
             // Ask player if they want to play again
             System.out.println("Do you want to play again(y/n)?");
@@ -170,6 +177,14 @@ public class BlackJackGame extends Game {
                 System.out.println("You cashed out with: " + player.getChips());
                 break;
             }
+            
+            
+        // if the play reaches 0 or less chips they lose
+        if (player.getChips() <= 0) {
+            System.out.println("You have run out of chips.. Better luck next time");
+            playAgain = false;
+        }
+
 
             // Reset player's hand, dealer's hand, and deck for a new game
             //Otherwise hand will fill will null values
@@ -191,14 +206,20 @@ public class BlackJackGame extends Game {
         player.getHand().clearHand();
         System.out.println("player chips is: " + player.getChips());
         int playerScore = player.getHand().calculateHandValue();
-
-        if (player.hasBlackjack()) {
+        
+        if(playerScore == dealerScore){
+            System.out.println(player.getName() + " ties with the dealer.");
+        } else if (playerScore  >21 && dealerScore >21 ) {
+        System.out.println(player.getName() + " ties with the dealer.");
+        } else if (player.hasBlackjack()) {
             System.out.println("Blackjack! Congratulations, " + player.getName() + " wins!");
             player.updateChips((int) (player.getBetAmount() * 1.5), true);
+        } else if (dealer.hasBlackjack()) {
+              System.out.println("Dealer has 21" + player.getName() + " loses.");
         } else if (playerScore > 21) {
             System.out.println(player.getName() + " busts! You lose.");
             player.updateChips(player.getBetAmount(), false);
-        } else if (dealerScore > 21) {
+        } else if (dealerScore > 21 && playerScore < 21) {
             System.out.println("Dealer busts! " + player.getName() + " wins!");
             player.updateChips(player.getBetAmount(), true);
         } else if (playerScore > dealerScore) {
@@ -210,6 +231,7 @@ public class BlackJackGame extends Game {
         } else {
             System.out.println(player.getName() + " ties with the dealer.");
         }
+        
 
         //Reset the dealers hand at the end of the round
         dealer.resetHand();
